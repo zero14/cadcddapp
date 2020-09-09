@@ -1,0 +1,15 @@
+{
+    "nombreApp":"fasturista",
+    "paths":[
+        {
+            "path":"profile",
+            "icon":"account_box",
+            "name":"Perfil"
+        },
+        {
+            "path":"setting",
+            "icon":"settings",
+            "name":"Configuración"
+        }
+    ]
+}
