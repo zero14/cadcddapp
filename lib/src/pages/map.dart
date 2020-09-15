@@ -19,7 +19,7 @@ class MapTourist extends StatefulWidget {
 class MapTouristState extends State<MapTourist> {
   GoogleMapController _mapController;
 
-  List<Lugar> lugares;
+  List<Itinerario> itinerarios;
 
   BitmapDescriptor pinLocationIcon;
 
@@ -58,16 +58,22 @@ class MapTouristState extends State<MapTourist> {
 
   @override
   void initState() {
-    _setIconCurrentLocation();
-    _getCurrentPosition();
     super.initState();
+    _getCurrentPosition();
+    _setIconCurrentLocation();
   }
 
   void _getCurrentPosition() async {
     final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
+    _isLoading = true;
+
     _currentPosition = await geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+
+    _isLoading = false;
+
+    _addMarkerPositionInitial();
   }
 
   void _setIconCurrentLocation() async {
@@ -144,10 +150,11 @@ class MapTouristState extends State<MapTourist> {
     final lugarProvider = LugarProvider();
 
     _isLoading = true;
+    int index = 0;
 
     // List<Lugar> items = await lugarProvider.getLugar(
     //     _currentPosition.latitude, _currentPosition.longitude);
-    lugares = await lugarProvider.getLugar(
+    itinerarios = await lugarProvider.getItinerario(
         _currentPosition.latitude, _currentPosition.longitude);
 
     setState(() {
@@ -184,37 +191,41 @@ class MapTouristState extends State<MapTourist> {
             }),
       );
 
-      for (final item in lugares) {
-        _markers.add(Marker(
-            markerId: MarkerId(item.placeId),
-            icon: BitmapDescriptor.defaultMarker,
-            position:
-                LatLng(item.geometry.location.lat, item.geometry.location.lng),
-            infoWindow: InfoWindow(
-              title: item.name,
-            ),
-            onTap: () {
-              setState(() {
-                // _currentPinData = _sourcePinInfo;
-                _currentPinData = PinData(
-                  showLocation: false,
-                  // pinPath: 'assets/img/turista_varon.png',
-                  pinPath: null,
-                  pinPathLocal: 'assets/img/marker.png',
-                  locationName: item.name,
-                  locationAddress: item.formattedAddress != null
-                      ? item.formattedAddress
-                      : "",
-                  location: LatLng(
-                      item.geometry.location.lat, item.geometry.location.lng),
-                  avatarPath: item.icon,
-                  avatarPathLocal: null,
-                  labelColor: Colors.blue,
-                );
-                _pinPillPosition = 0;
-                _verticalButtonMyPosition = 100.0;
-              });
-            }));
+      for (final item in itinerarios) {
+        for (var lugar in item.lugares) {
+          index++;
+
+          _markers.add(
+            Marker(
+                markerId: MarkerId("markeid$index"),
+                icon: BitmapDescriptor.defaultMarker,
+                position: LatLng(lugar.lat, lugar.lng),
+                infoWindow: InfoWindow(
+                  title: lugar.name,
+                ),
+                onTap: () {
+                  setState(() {
+                    // _currentPinData = _sourcePinInfo;
+                    _currentPinData = PinData(
+                      showLocation: false,
+                      // pinPath: 'assets/img/turista_varon.png',
+                      pinPath: null,
+                      pinPathLocal: 'assets/img/marker.png',
+                      locationName: lugar.name,
+                      locationAddress: lugar.formattedAddress != null
+                          ? lugar.formattedAddress
+                          : "",
+                      location: LatLng(lugar.lat, lugar.lng),
+                      avatarPath: lugar.icon,
+                      avatarPathLocal: null,
+                      labelColor: Colors.blue,
+                    );
+                    _pinPillPosition = 0;
+                    _verticalButtonMyPosition = 100.0;
+                  });
+                }),
+          );
+        }
       }
 
       _isLoading = false;
@@ -249,10 +260,30 @@ class MapTouristState extends State<MapTourist> {
       return Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+        children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[CircularProgressIndicator()],
+            // children: <Widget>[CircularProgressIndicator()],
+            children: [
+              Container(
+                height: 160.0,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(80.0),
+                  boxShadow: [BoxShadow(color: Colors.black, blurRadius: 2.0)],
+                ),
+                child: Column(
+                  children: [
+                    Image.asset(
+                      "assets/img/loading_walk_man.gif",
+                      scale: 4.5,
+                    ),
+                    Text("Cargando...")
+                  ],
+                ),
+              )
+              // CircularProgressIndicator()
+            ],
           ),
           SizedBox(height: 15.0)
         ],
@@ -444,7 +475,7 @@ class MapTouristState extends State<MapTourist> {
                   context,
                   PageAnimated(
                       page: OptimalPath(
-                    lugares: lugares,
+                    itinerarios: itinerarios,
                   )).slideTransition());
             },
             child: Text("Ruta"),
