@@ -12,28 +12,15 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
+  String _name = "";
+  String _lastName = "";
+  String _email = "";
   String _dateBirthday = "";
 
   TabController _tabController;
   ScrollController _scrollViewController;
 
-  final List<String> _list = [];
-
-  bool _symmetry = false;
-  bool _removeButton = true;
-  bool _singleItem = false;
-  bool _startDirection = false;
-  bool _horizontalScroll = false;
-  bool _withSuggesttions = false;
-  int _count = 0;
-  int _column = 0;
-  double _fontSize = 14;
-
-  String _itemCombine = 'withTextBefore';
-
-  String _onPressed = '';
-
-  List _icon = [Icons.home, Icons.language, Icons.headset];
+  final List<String> _list = ["Parque", "Museo", "Playa", "Iglesia"];
 
   List _items;
 
@@ -48,6 +35,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
     _tabController = TabController(length: 1, vsync: this);
     _scrollViewController = ScrollController();
+    _inputDateController.text = "01/03/1991";
 
     _items = _list.toList();
   }
@@ -178,6 +166,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Widget _createInputName() {
     return TextFormField(
+      controller: TextEditingController(text: "Joel"),
       keyboardType: TextInputType.name,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
@@ -185,11 +174,17 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         helperText: "",
         prefixIcon: Icon(Icons.person),
       ),
+      onChanged: (value) {
+        setState(() {
+          _name = value;
+        });
+      },
     );
   }
 
   Widget _createInputLastName() {
     return TextFormField(
+      controller: TextEditingController(text: "Pacheco"),
       keyboardType: TextInputType.name,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
@@ -197,11 +192,17 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         helperText: "",
         prefixIcon: Icon(Icons.person),
       ),
+      onChanged: (value) {
+        setState(() {
+          _lastName = value;
+        });
+      },
     );
   }
 
   Widget _createInputEmail() {
     return TextFormField(
+      controller: TextEditingController(text: "joel@gmail.com"),
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
@@ -209,6 +210,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         helperText: "",
         prefixIcon: Icon(Icons.email),
       ),
+      onChanged: (value) {
+        setState(() {
+          _email = value;
+        });
+      },
     );
   }
 

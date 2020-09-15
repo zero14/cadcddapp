@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 class LugarProvider {
   final _url = "https://cadcdd.herokuapp.com";
 
-  Future<List<Lugar>> _procesarRespuestaPOST(
+  Future<List<Itinerario>> _procesarRespuestaPOST(
       String path, Map<String, dynamic> parametros) async {
     final respuesta = await http.post(
       "$_url/$path",
@@ -18,12 +18,17 @@ class LugarProvider {
 
     final decodedData = json.decode(utf8.decode(respuesta.bodyBytes));
 
-    final lugares = new Lugares.fromJsonList(decodedData);
+    print(decodedData["itinerary_plan"]);
 
-    return lugares.items;
+    final itinerarios =
+        new Itinerarios.fromJsonList(decodedData["itinerary_plan"]);
+
+    return itinerarios.items;
   }
 
-  Future<List<Lugar>> getLugar(double latitude, double longitude) async {
+  Future<List<Itinerario>> getItinerario(
+      double latitude, double longitude) async {
+    print("LAITUDE:$latitude,LONGITUDE:$longitude");
     final path = "tours/suggest";
     Map<String, dynamic> parametros = {
       "total_days": 3,
