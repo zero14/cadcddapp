@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tags/flutter_tags.dart';
@@ -20,13 +20,15 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   TabController _tabController;
   ScrollController _scrollViewController;
 
-  final List<String> _list = ["Parque", "Museo", "Playa", "Iglesia"];
+  final List<String> _list = ["Parque", "Iglesia"];
 
   List _items;
 
   TextEditingController _inputDateController = new TextEditingController();
 
   Offset _tapPosition;
+
+  bool _editEnabled = false;
 
   @override
   void initState() {
@@ -40,44 +42,23 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     _items = _list.toList();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Perfil"),
-          backgroundColor: Colors.green,
+  Widget _createButtonSave() {
+    if (!this._editEnabled) return Container();
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: ButtonTheme(
+        height: 50.0,
+        child: RaisedButton(
+          textColor: Colors.white,
+          color: Colors.green,
+          child: Text("Guardar"),
+          onPressed: () {},
+          shape: new RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(30.0),
+          ),
         ),
-        body: Stack(
-          children: [
-            ListView(
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-              children: [
-                _createInputName(),
-                _createInputLastName(),
-                _createInputEmail(),
-                _createInputDate(context),
-                ExpansionTile(
-                  title: Text("Preferencias"),
-                  children: [_tag],
-                ),
-                Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: ButtonTheme(
-                      height: 50.0,
-                      child: RaisedButton(
-                        textColor: Colors.white,
-                        color: Colors.green,
-                        child: Text("Guardar"),
-                        onPressed: () {},
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0),
-                        ),
-                      ),
-                    )),
-              ],
-            ),
-          ],
-        ));
+      ),
+    );
   }
 
   Widget get _tag {
@@ -94,7 +75,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           fontSize: 14,
           //height: 1
         ),
-        enabled: true,
+        enabled: _editEnabled,
         constraintSuggestion: true,
         onSubmitted: (String str) {
           setState(() {
@@ -115,12 +96,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             activeColor: Colors.green[400],
             removeButton: ItemTagsRemoveButton(
               backgroundColor: Colors.green[900],
-              onRemoved: () {
-                setState(() {
-                  _items.removeAt(index);
-                });
-                return true;
-              },
+              onRemoved: _editEnabled
+                  ? null
+                  : () {
+                      setState(() {
+                        _items.removeAt(index);
+                      });
+                      return true;
+                    },
             ),
             textScaleFactor:
                 utf8.encode(item.substring(0, 1)).length > 2 ? 0.8 : 1,
@@ -164,12 +147,33 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     );
   }
 
+  Widget _createImageProfile() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white70,
+        borderRadius: BorderRadius.circular(50.0),
+      ),
+      padding: EdgeInsets.all(10.0),
+      child: CircleAvatar(
+        radius: 65,
+        backgroundColor: Colors.green[200],
+        child: CircleAvatar(
+          radius: 60,
+          backgroundImage: AssetImage('assets/img/profile1.jpg'),
+        ),
+      ),
+    );
+  }
+
   Widget _createInputName() {
     return TextFormField(
+      enabled: _editEnabled,
       controller: TextEditingController(text: "Joel"),
       keyboardType: TextInputType.name,
       decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
+        border: _editEnabled
+            ? OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))
+            : null,
         labelText: "Nombre",
         helperText: "",
         prefixIcon: Icon(Icons.person),
@@ -184,10 +188,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Widget _createInputLastName() {
     return TextFormField(
+      enabled: _editEnabled,
       controller: TextEditingController(text: "Pacheco"),
       keyboardType: TextInputType.name,
       decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
+        border: _editEnabled
+            ? OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))
+            : null,
         labelText: "Apellido",
         helperText: "",
         prefixIcon: Icon(Icons.person),
@@ -202,10 +209,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Widget _createInputEmail() {
     return TextFormField(
+      enabled: _editEnabled,
       controller: TextEditingController(text: "joel@gmail.com"),
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
+        border: _editEnabled
+            ? OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))
+            : null,
         labelText: "Correo electrónico",
         helperText: "",
         prefixIcon: Icon(Icons.email),
@@ -220,11 +230,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Widget _createInputDate(context) {
     return TextFormField(
+      enabled: _editEnabled,
       controller: _inputDateController,
       enableInteractiveSelection: false,
       keyboardType: TextInputType.datetime,
       decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
+        border: _editEnabled
+            ? OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))
+            : null,
         labelText: "Fecha de Nacimiento",
         helperText: "",
         prefixIcon: Icon(Icons.date_range),
@@ -253,5 +266,63 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         _inputDateController.text = new DateFormat("dd-MM-yyyy").format(picked);
       });
     }
+  }
+
+  Icon _showButtonEditOrCancel() {
+    return _editEnabled
+        ? Icon(Icons.close, color: Colors.white)
+        : Icon(Icons.edit, color: Colors.white);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Perfil"),
+          centerTitle: true,
+          backgroundColor: Colors.green,
+          actions: [
+            IconButton(
+              icon: _showButtonEditOrCancel(),
+              onPressed: () {
+                setState(() {
+                  _editEnabled = !_editEnabled;
+                });
+              },
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: _createImageProfile()),
+                  ],
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.all(10.0),
+                    children: [
+                      _createInputName(),
+                      _createInputLastName(),
+                      _createInputEmail(),
+                      _createInputDate(context),
+                      ExpansionTile(
+                        maintainState: _editEnabled,
+                        initiallyExpanded: !_editEnabled,
+                        title: Text("Preferencias"),
+                        children: [_tag],
+                      ),
+                      _createButtonSave()
+                    ],
+                  ),
+                ),
+              ],
+            )
+          ],
+        ));
   }
 }

@@ -129,7 +129,7 @@ class MapTouristState extends State<MapTourist> {
                           ? LatLng(_currentPosition.latitude,
                               _currentPosition.longitude)
                           : _defaultPosition,
-                      avatarPathLocal: "assets/img/foto_perfil.jpg",
+                      avatarPathLocal: "assets/img/profile1.jpg",
                       labelColor: Colors.blue);
                   _pinPillPosition = 0;
                   _verticalButtonMyPosition = 100.0;
@@ -182,7 +182,7 @@ class MapTouristState extends State<MapTourist> {
                         ? LatLng(_currentPosition.latitude,
                             _currentPosition.longitude)
                         : _defaultPosition,
-                    avatarPathLocal: "assets/img/foto_perfil.jpg",
+                    avatarPathLocal: "assets/img/profile1.jpg",
                     avatarPath: null,
                     labelColor: Colors.blue);
                 _pinPillPosition = 0;
@@ -353,7 +353,7 @@ class MapTouristState extends State<MapTourist> {
         backgroundColor: Theme.of(context).platform == TargetPlatform.iOS
             ? Colors.green
             : Colors.green,
-        backgroundImage: AssetImage("assets/img/foto_perfil.jpg"),
+        backgroundImage: AssetImage("assets/img/profile1.jpg"),
       ),
     );
   }
