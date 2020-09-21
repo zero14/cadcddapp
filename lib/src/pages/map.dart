@@ -30,7 +30,7 @@ class MapTouristState extends State<MapTourist> {
 
   Set<Marker> _markers = {};
 
-  LatLng _lastMapPosition = LatLng(-12.032654973289382, -77.07533940490184);
+  // LatLng _lastMapPosition = LatLng(-12.032654973289382, -77.07533940490184);
 
   bool _isSearchText = false;
 
@@ -83,7 +83,7 @@ class MapTouristState extends State<MapTourist> {
   }
 
   void _onCameraMove(CameraPosition position) {
-    _lastMapPosition = position.target;
+    // _lastMapPosition = position.target;
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -105,7 +105,6 @@ class MapTouristState extends State<MapTourist> {
   void _addMarkerPositionInitial() {
     setState(() {
       if (indice == 0) {
-        indice++;
         _markers.add(
           Marker(
               markerId: MarkerId("pinicial"),
@@ -129,7 +128,7 @@ class MapTouristState extends State<MapTourist> {
                           ? LatLng(_currentPosition.latitude,
                               _currentPosition.longitude)
                           : _defaultPosition,
-                      avatarPathLocal: "assets/img/foto_perfil.jpg",
+                      avatarPathLocal: "assets/img/profile1.jpg",
                       labelColor: Colors.blue);
                   _pinPillPosition = 0;
                   _verticalButtonMyPosition = 100.0;
@@ -146,16 +145,14 @@ class MapTouristState extends State<MapTourist> {
     _centerPosition();
   }
 
-  Future<void> _buscarPuntoInteres() async {
+  Future<void> _buscarPuntoInteres(String textSearch) async {
     final lugarProvider = LugarProvider();
 
     _isLoading = true;
     int index = 0;
 
-    // List<Lugar> items = await lugarProvider.getLugar(
-    //     _currentPosition.latitude, _currentPosition.longitude);
     itinerarios = await lugarProvider.getItinerario(
-        _currentPosition.latitude, _currentPosition.longitude);
+        _currentPosition.latitude, _currentPosition.longitude, textSearch);
 
     setState(() {
       _markers.clear();
@@ -182,7 +179,7 @@ class MapTouristState extends State<MapTourist> {
                         ? LatLng(_currentPosition.latitude,
                             _currentPosition.longitude)
                         : _defaultPosition,
-                    avatarPathLocal: "assets/img/foto_perfil.jpg",
+                    avatarPathLocal: "assets/img/profile1.jpg",
                     avatarPath: null,
                     labelColor: Colors.blue);
                 _pinPillPosition = 0;
@@ -346,14 +343,14 @@ class MapTouristState extends State<MapTourist> {
             ),
           ],
         ),
-        padding: EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.only(top: 10),
       ),
       accountEmail: Text("joel.pacheco@gmail.com"),
       currentAccountPicture: CircleAvatar(
         backgroundColor: Theme.of(context).platform == TargetPlatform.iOS
             ? Colors.green
             : Colors.green,
-        backgroundImage: AssetImage("assets/img/foto_perfil.jpg"),
+        backgroundImage: const AssetImage("assets/img/profile1.jpg"),
       ),
     );
   }
@@ -383,11 +380,6 @@ class MapTouristState extends State<MapTourist> {
 
   Widget _rowSearchAppBar() {
     if (_isSearchText) {
-      // setState(() {
-      //   _pinPillPosition = -100;
-      //   _verticalButtonMyPosition = 15.0;
-      // });
-
       return _searchText();
     } else {
       return _defaultSearch();
@@ -440,7 +432,6 @@ class MapTouristState extends State<MapTourist> {
                       color: Colors.white,
                     ),
                     onPressed: () {
-                      print("ingreso");
                       setState(() {
                         _isSearchText = false;
                       });
@@ -449,7 +440,7 @@ class MapTouristState extends State<MapTourist> {
             ),
             onSubmitted: (text) async {
               setState(() {
-                _buscarPuntoInteres();
+                _buscarPuntoInteres(text);
               });
             },
           ),
@@ -491,21 +482,21 @@ class MapTouristState extends State<MapTourist> {
   Widget _buildAvatar() {
     if (_currentPinData.avatarPath != null) {
       return Container(
-        margin: EdgeInsets.only(left: 10),
+        margin: const EdgeInsets.only(left: 10),
         width: 50,
         height: 50,
         child: ClipOval(child: Image.network(_currentPinData.avatarPath)),
       );
     } else if (_currentPinData.avatarPathLocal != null) {
       return Container(
-        margin: EdgeInsets.only(left: 10),
+        margin: const EdgeInsets.only(left: 10),
         width: 50,
         height: 50,
         child: ClipOval(child: Image.asset(_currentPinData.avatarPathLocal)),
       );
     } else {
       return Container(
-        margin: EdgeInsets.only(left: 10),
+        margin: const EdgeInsets.only(left: 10),
         width: 50,
         height: 50,
         child: ClipOval(child: Image.asset(_imageDefault)),
@@ -560,7 +551,7 @@ class MapTouristState extends State<MapTourist> {
   Widget _buildMarkerType() {
     if (_currentPinData.pinPath != null) {
       return Padding(
-          padding: EdgeInsets.all(2.0),
+          padding: const EdgeInsets.all(2.0),
           child: Image.network(
             _currentPinData.pinPath,
             width: 30,
@@ -568,7 +559,7 @@ class MapTouristState extends State<MapTourist> {
           ));
     } else if (_currentPinData.pinPathLocal != null) {
       return Padding(
-          padding: EdgeInsets.all(2.0),
+          padding: const EdgeInsets.all(2.0),
           child: Image.asset(
             _currentPinData.pinPathLocal,
             width: 30,
@@ -594,15 +585,15 @@ class MapTouristState extends State<MapTourist> {
             bottom: _pinPillPosition,
             right: 0,
             left: 0,
-            duration: Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 500),
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                margin: EdgeInsets.all(20),
+                margin: const EdgeInsets.all(20),
                 height: 70,
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(50)),
+                    borderRadius: const BorderRadius.all(Radius.circular(50)),
                     boxShadow: <BoxShadow>[
                       BoxShadow(
                         blurRadius: 20,

@@ -7,6 +7,7 @@ class PageAnimated {
 
   Route slideTransition() {
     return PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 500),
       pageBuilder: (context, animation, secondaryAnimation) => this.page,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(0.0, 1.0);
@@ -26,6 +27,7 @@ class PageAnimated {
 
   Route slideRightTransition() {
     return PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 500),
       pageBuilder: (context, animation, secondaryAnimation) => this.page,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(-1.0, 0.0);

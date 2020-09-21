@@ -27,13 +27,15 @@ class LugarProvider {
   }
 
   Future<List<Itinerario>> getItinerario(
-      double latitude, double longitude) async {
+      double latitude, double longitude, String textSearch) async {
     print("LAITUDE:$latitude,LONGITUDE:$longitude");
     final path = "tours/suggest";
     Map<String, dynamic> parametros = {
       "total_days": 3,
       "location": {"latitude": latitude, "longitude": longitude},
-      "categories": ["parque"],
+      "categories": textSearch != null && textSearch != ''
+          ? ["$textSearch"]
+          : ["parque", "Iglesia"],
       "start_date": "2020-08-21"
     };
 
