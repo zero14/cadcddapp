@@ -24,7 +24,7 @@ class _OptimalPathState extends State<OptimalPath> {
       return Container(
         height: 200.0,
         width: 350.0,
-        margin: EdgeInsets.all(10.0),
+        margin: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15.0),
@@ -38,7 +38,8 @@ class _OptimalPathState extends State<OptimalPath> {
           children: [
             Text(
               "DIA:$day",
-              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+              style:
+                  const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -56,10 +57,9 @@ class _OptimalPathState extends State<OptimalPath> {
 
     widget.itinerarios.forEach((itinerario) {
       _showDay = true;
-      print("DIA:${itinerario.day}");
-      for (var lugar in itinerario.lugares) {
-        print("LUGARES:${lugar.name}");
+      index = 0;
 
+      for (var lugar in itinerario.lugares) {
         final container = Container(
           child: Column(
             children: [
@@ -74,8 +74,8 @@ class _OptimalPathState extends State<OptimalPath> {
                         color: Colors.black,
                       ),
                       Container(
-                        margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                        padding: EdgeInsets.all(5.0),
+                        margin: const EdgeInsets.only(left: 5.0, right: 5.0),
+                        padding: const EdgeInsets.all(5.0),
                         decoration: BoxDecoration(
                           color: colors[(index + 1) % 3],
                           borderRadius: BorderRadius.circular(50.0),
@@ -92,7 +92,7 @@ class _OptimalPathState extends State<OptimalPath> {
                   Expanded(
                     child: Container(
                       height: 100,
-                      margin: EdgeInsets.all(10.0),
+                      margin: const EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border(
@@ -104,17 +104,20 @@ class _OptimalPathState extends State<OptimalPath> {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(lugar.name,
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold)),
-                            Text(lugar.formattedAddress,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ))
-                          ],
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(lugar.name,
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                              Text(lugar.formattedAddress,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ))
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -126,6 +129,8 @@ class _OptimalPathState extends State<OptimalPath> {
         );
 
         _showDay = false;
+
+        index++;
 
         items..add(container);
       }

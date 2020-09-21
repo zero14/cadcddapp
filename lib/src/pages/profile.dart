@@ -1,6 +1,8 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tags/flutter_tags.dart';
@@ -12,40 +14,96 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
+  final picker = ImagePicker();
+  final List<String> _list = ["Parque", "Iglesia"];
+  File _image;
+  List _items;
   String _name = "";
   String _lastName = "";
   String _email = "";
   String _dateBirthday = "";
 
-  TabController _tabController;
-  ScrollController _scrollViewController;
-
-  final List<String> _list = ["Parque", "Iglesia"];
-
-  List _items;
+  // TabController _tabController;
+  // ScrollController _scrollViewController;
 
   TextEditingController _inputDateController = new TextEditingController();
+  TextEditingController _inputNameController = new TextEditingController();
+  TextEditingController _inputLastNameController = new TextEditingController();
+  TextEditingController _inputEmailController = new TextEditingController();
 
   Offset _tapPosition;
-
   bool _editEnabled = false;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    _tabController = TabController(length: 1, vsync: this);
-    _scrollViewController = ScrollController();
-    _inputDateController.text = "01/03/1991";
+    // _tabController = TabController(length: 1, vsync: this);
+    // _scrollViewController = ScrollController();
+    _inputDateController.text = "01-03-1991";
+    _inputNameController.text = "Joel";
+    _inputLastNameController.text = "Pacheco";
+    _inputEmailController.text = "joel@gmail.com";
 
     _items = _list.toList();
+  }
+
+  Future _imgFromGallery() async {
+    final pickedImage =
+        await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
+
+    setState(() {
+      _image = pickedImage != null ? File(pickedImage.path) : null;
+    });
+  }
+
+  Future _imgFromCamera() async {
+    final pickedImage =
+        await picker.getImage(source: ImageSource.camera, imageQuality: 50);
+
+    setState(() {
+      _image = pickedImage != null ? File(pickedImage.path) : null;
+    });
+  }
+
+  void _showPicker(context) {
+    showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: Wrap(
+                children: [
+                  ListTile(
+                      leading: Icon(Icons.photo_library),
+                      title: Text('Galería de Fotos'),
+                      onTap: () {
+                        _imgFromGallery();
+                        Navigator.of(context).pop();
+                      }),
+                  Divider(),
+                  ListTile(
+                    leading: Icon(Icons.photo_camera),
+                    title: Text('Camara'),
+                    onTap: () {
+                      _imgFromCamera();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   Widget _createButtonSave() {
     if (!this._editEnabled) return Container();
     return Padding(
-      padding: EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(10.0),
       child: ButtonTheme(
         height: 50.0,
         child: RaisedButton(
@@ -53,8 +111,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           color: Colors.green,
           child: Text("Guardar"),
           onPressed: () {},
-          shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(30.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
           ),
         ),
       ),
@@ -96,7 +154,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             activeColor: Colors.green[400],
             removeButton: ItemTagsRemoveButton(
               backgroundColor: Colors.green[900],
-              onRemoved: _editEnabled
+              onRemoved: !_editEnabled
                   ? null
                   : () {
                       setState(() {
@@ -124,7 +182,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   PopupMenuItem(
                     value: 1,
                     child: Row(
-                      children: <Widget>[
+                      children: [
                         Icon(Icons.content_copy),
                         Text("Copy text"),
                       ],
@@ -153,13 +211,34 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         color: Colors.white70,
         borderRadius: BorderRadius.circular(50.0),
       ),
-      padding: EdgeInsets.all(10.0),
-      child: CircleAvatar(
-        radius: 65,
-        backgroundColor: Colors.green[200],
+      padding: const EdgeInsets.all(10.0),
+      child: GestureDetector(
+        onTap: _editEnabled
+            ? () {
+                // _imgFromGallery();
+                _showPicker(context);
+              }
+            : null,
         child: CircleAvatar(
-          radius: 60,
-          backgroundImage: AssetImage('assets/img/profile1.jpg'),
+          radius: 65,
+          backgroundColor: Colors.green[200],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(60),
+            child: _image != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.file(_image,
+                        width: 120, height: 120, fit: BoxFit.fitHeight),
+                  )
+                : Container(
+                    decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(50)),
+                    width: 120,
+                    height: 120,
+                    child: Icon(Icons.camera_alt, color: Colors.grey[800]),
+                  ),
+          ),
         ),
       ),
     );
@@ -168,7 +247,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   Widget _createInputName() {
     return TextFormField(
       enabled: _editEnabled,
-      controller: TextEditingController(text: "Joel"),
+      controller: _inputNameController,
       keyboardType: TextInputType.name,
       decoration: InputDecoration(
         border: _editEnabled
@@ -189,7 +268,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   Widget _createInputLastName() {
     return TextFormField(
       enabled: _editEnabled,
-      controller: TextEditingController(text: "Pacheco"),
+      controller: _inputLastNameController,
       keyboardType: TextInputType.name,
       decoration: InputDecoration(
         border: _editEnabled
@@ -210,7 +289,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   Widget _createInputEmail() {
     return TextFormField(
       enabled: _editEnabled,
-      controller: TextEditingController(text: "joel@gmail.com"),
+      controller: _inputEmailController,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         border: _editEnabled
@@ -304,7 +383,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 ),
                 Expanded(
                   child: ListView(
-                    padding: EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(10.0),
                     children: [
                       _createInputName(),
                       _createInputLastName(),
