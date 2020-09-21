@@ -585,7 +585,7 @@ class MapTouristState extends State<MapTourist> {
             bottom: _pinPillPosition,
             right: 0,
             left: 0,
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 500),
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Container(
