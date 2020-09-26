@@ -1,6 +1,7 @@
 import 'package:fasturista/src/models/Lugar.dart';
 import 'package:fasturista/src/models/PageAnimate.dart';
 import 'package:fasturista/src/models/PinData.dart';
+import 'package:fasturista/src/pages/LoginPage.dart';
 import 'package:fasturista/src/pages/OptimalPath.dart';
 import 'package:fasturista/src/providers/LugarProvider.dart';
 import 'package:fasturista/src/providers/MenuProvider.dart';
@@ -12,6 +13,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapTourist extends StatefulWidget {
+  MapTourist({Key key, this.userEmail}) : super(key: key);
+
+  final String userEmail;
+
   @override
   State<MapTourist> createState() => MapTouristState();
 }
@@ -70,6 +75,15 @@ class MapTouristState extends State<MapTourist> {
 
     _currentPosition = await geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+
+    if (widget.userEmail == "joel@gmail.com") {
+      _currentPosition =
+          Position(latitude: -12.0326956, longitude: -77.0753499);
+    } else if (widget.userEmail == "miguel@gmail.com") {
+      _currentPosition = Position(latitude: -12.064677, longitude: -77.037416);
+    } else if (widget.userEmail == "maria@gmail.com") {
+      _currentPosition = Position(latitude: -12.11922, longitude: -77.029385);
+    }
 
     _isLoading = false;
 
@@ -238,11 +252,21 @@ class MapTouristState extends State<MapTourist> {
         title: Text(item["name"]),
         leading: getIcon(item["icon"]),
         onTap: () {
-          Navigator.push(
-            context,
-            PageAnimated(page: getRoutePage(item["path"]))
-                .slideRightTransition(),
-          );
+          if (item["path"] == "profile") {
+            final parameters = {"email": widget.userEmail};
+            Navigator.push(
+              context,
+              PageAnimated(
+                      page: getRoutePage(item["path"], parameters: parameters))
+                  .slideRightTransition(),
+            );
+          } else {
+            Navigator.push(
+              context,
+              PageAnimated(page: getRoutePage(item["path"]))
+                  .slideRightTransition(),
+            );
+          }
         },
       );
 
@@ -299,7 +323,9 @@ class MapTouristState extends State<MapTourist> {
           Flexible(child: _listaMenu()),
           ListTile(
             onTap: () {
-              Navigator.pop(context);
+              // Navigator.pop(context);
+              Navigator.push(
+                  context, PageAnimated(page: LoginPage()).slideTransition());
             },
             dense: true,
             leading: Icon(Icons.subdirectory_arrow_left),

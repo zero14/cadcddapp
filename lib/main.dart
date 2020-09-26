@@ -1,4 +1,4 @@
-import 'package:fasturista/src/pages/map.dart';
+import 'package:fasturista/src/pages/WelcomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -22,7 +22,7 @@ class TouristRunApp extends StatelessWidget {
       // routes: getApplicationRoutes(),
       onGenerateRoute: (RouteSettings setting) {
         return MaterialPageRoute(
-          builder: (context) => MapTourist(),
+          builder: (context) => WelcomePage(),
         );
       },
     );

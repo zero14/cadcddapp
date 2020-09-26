@@ -11,6 +11,9 @@ import 'package:intl/intl.dart';
 class Profile extends StatefulWidget {
   @override
   _ProfileState createState() => _ProfileState();
+  Profile({Key key, this.userEmail}) : super(key: key);
+
+  final String userEmail;
 }
 
 class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
@@ -40,10 +43,27 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
     // _tabController = TabController(length: 1, vsync: this);
     // _scrollViewController = ScrollController();
-    _inputDateController.text = "01-03-1991";
-    _inputNameController.text = "Joel";
-    _inputLastNameController.text = "Pacheco";
-    _inputEmailController.text = "joel@gmail.com";
+
+    if (widget.userEmail == "joel@gmail.com") {
+      _inputDateController.text = "01-03-1991";
+      _inputNameController.text = "Joel";
+      _inputLastNameController.text = "Pacheco";
+      _inputEmailController.text = "joel@gmail.com";
+    }
+
+    if (widget.userEmail == "miguel@gmail.com") {
+      _inputDateController.text = "01-03-1990";
+      _inputNameController.text = "Carlos";
+      _inputLastNameController.text = "Perez";
+      _inputEmailController.text = "miguel@gmail.com";
+    }
+
+    if (widget.userEmail == "maria@gmail.com") {
+      _inputDateController.text = "01-03-1993";
+      _inputNameController.text = "Maria";
+      _inputLastNameController.text = "Lopez";
+      _inputEmailController.text = "maria@gmail.com";
+    }
 
     _items = _list.toList();
   }
