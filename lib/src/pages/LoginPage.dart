@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:fasturista/src/models/CustomClipPath.dart';
 import 'package:fasturista/src/models/PageAnimate.dart';
+import 'package:fasturista/src/models/User.dart';
 import 'package:fasturista/src/pages/map.dart';
+import 'package:fasturista/src/providers/UserProvider.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,9 +18,43 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _showLoading = false;
-
+  User userLogin = new User();
+  bool _loginOk = false;
   TextEditingController _userEmailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _showDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Oh no!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Usuario o contraseña incorrecto'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(
+                'Aceptar',
+                style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Widget _backButton() {
     return InkWell(
@@ -82,6 +118,25 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<void> login() async {
+    final userProvider = UserProvider();
+    this.userLogin = await userProvider.login(
+        this._userEmailController.text, this._passwordController.text);
+    print(this.userLogin.toString());
+
+    if (this.userLogin != null &&
+        this.userLogin.code == 200 &&
+        this.userLogin.message != "ok") {
+      this._showDialog();
+      this._loginOk = false;
+      setState(() {
+        _showLoading = false;
+      });
+    } else {
+      this._loginOk = true;
+    }
+  }
+
   Widget _buttonLogin() {
     return Padding(
       padding: const EdgeInsets.all(5.0),
@@ -96,17 +151,20 @@ class _LoginPageState extends State<LoginPage> {
                     style:
                         TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
                 onPressed: () {
+                  this.login();
                   setState(() {
                     _showLoading = !_showLoading;
-
                     final duration = new Duration(seconds: 2);
                     Timer(duration, () {
-                      Navigator.push(
-                          context,
-                          PageAnimated(
-                            page: MapTourist(
-                                userEmail: this._userEmailController.text),
-                          ).slideTransition());
+                      _showLoading = false;
+                      if (this._loginOk) {
+                        Navigator.push(
+                            context,
+                            PageAnimated(
+                              page: MapTourist(
+                                  user: this.userLogin),
+                            ).slideTransition());
+                      }
                     });
                   });
                 },
@@ -250,7 +308,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            Positioned(top: 40, left: 0, child: _backButton()),
+            //Positioned(top: 40, left: 0, child: _backButton()),
           ],
         ),
       ),

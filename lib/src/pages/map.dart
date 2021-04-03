@@ -1,6 +1,7 @@
 import 'package:fasturista/src/models/Lugar.dart';
 import 'package:fasturista/src/models/PageAnimate.dart';
 import 'package:fasturista/src/models/PinData.dart';
+import 'package:fasturista/src/models/User.dart';
 import 'package:fasturista/src/pages/LoginPage.dart';
 import 'package:fasturista/src/pages/OptimalPath.dart';
 import 'package:fasturista/src/providers/LugarProvider.dart';
@@ -13,9 +14,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapTourist extends StatefulWidget {
-  MapTourist({Key key, this.userEmail}) : super(key: key);
+  MapTourist({Key key, this.user}) : super(key: key);
 
-  final String userEmail;
+  final User user;
 
   @override
   State<MapTourist> createState() => MapTouristState();
@@ -76,14 +77,15 @@ class MapTouristState extends State<MapTourist> {
     _currentPosition = await geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
 
-    if (widget.userEmail == "joel@gmail.com") {
-      _currentPosition =
-          Position(latitude: -12.0326956, longitude: -77.0753499);
-    } else if (widget.userEmail == "miguel@gmail.com") {
-      _currentPosition = Position(latitude: -12.064677, longitude: -77.037416);
-    } else if (widget.userEmail == "maria@gmail.com") {
-      _currentPosition = Position(latitude: -12.11922, longitude: -77.029385);
-    }
+    // if (widget.userEmail == "joel@gmail.com") {
+    //   _currentPosition =
+    //       Position(latitude: -12.0326956, longitude: -77.0753499);
+    // }
+    // if (widget.userEmail == "miguel@gmail.com") {
+    //   _currentPosition = Position(latitude: -12.064677, longitude: -77.037416);
+    // } else if (widget.userEmail == "maria@gmail.com") {
+    //   _currentPosition = Position(latitude: -12.11922, longitude: -77.029385);
+    // }
 
     _isLoading = false;
 
@@ -204,38 +206,40 @@ class MapTouristState extends State<MapTourist> {
 
       for (final item in itinerarios) {
         for (var lugar in item.lugares) {
-          index++;
+          if (lugar.lat != null && lugar.lng != null) {
+            index++;
 
-          _markers.add(
-            Marker(
-                markerId: MarkerId("markeid$index"),
-                icon: BitmapDescriptor.defaultMarker,
-                position: LatLng(lugar.lat, lugar.lng),
-                infoWindow: InfoWindow(
-                  title: lugar.name,
-                ),
-                onTap: () {
-                  setState(() {
-                    // _currentPinData = _sourcePinInfo;
-                    _currentPinData = PinData(
-                      showLocation: false,
-                      // pinPath: 'assets/img/turista_varon.png',
-                      pinPath: null,
-                      pinPathLocal: 'assets/img/marker.png',
-                      locationName: lugar.name,
-                      locationAddress: lugar.formattedAddress != null
-                          ? lugar.formattedAddress
-                          : "",
-                      location: LatLng(lugar.lat, lugar.lng),
-                      avatarPath: lugar.icon,
-                      avatarPathLocal: null,
-                      labelColor: Colors.blue,
-                    );
-                    _pinPillPosition = 0;
-                    _verticalButtonMyPosition = 100.0;
-                  });
-                }),
-          );
+            _markers.add(
+              Marker(
+                  markerId: MarkerId("markeid$index"),
+                  icon: BitmapDescriptor.defaultMarker,
+                  position: LatLng(lugar.lat, lugar.lng),
+                  infoWindow: InfoWindow(
+                    title: lugar.name,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      // _currentPinData = _sourcePinInfo;
+                      _currentPinData = PinData(
+                        showLocation: false,
+                        // pinPath: 'assets/img/turista_varon.png',
+                        pinPath: null,
+                        pinPathLocal: 'assets/img/marker.png',
+                        locationName: lugar.name,
+                        locationAddress: lugar.formattedAddress != null
+                            ? lugar.formattedAddress
+                            : "",
+                        location: LatLng(lugar.lat, lugar.lng),
+                        avatarPath: lugar.icon,
+                        avatarPathLocal: null,
+                        labelColor: Colors.blue,
+                      );
+                      _pinPillPosition = 0;
+                      _verticalButtonMyPosition = 100.0;
+                    });
+                  }),
+            );
+          }
         }
       }
 
@@ -253,11 +257,11 @@ class MapTouristState extends State<MapTourist> {
         leading: getIcon(item["icon"]),
         onTap: () {
           if (item["path"] == "profile") {
-            final parameters = {"email": widget.userEmail};
+            print(widget.user.email);
             Navigator.push(
               context,
               PageAnimated(
-                      page: getRoutePage(item["path"], parameters: parameters))
+                      page: getRoutePage(item["path"], parameters: widget.user))
                   .slideRightTransition(),
             );
           } else {

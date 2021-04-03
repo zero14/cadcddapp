@@ -1,5 +1,6 @@
 import 'package:fasturista/src/models/PageAnimate.dart';
 import 'package:fasturista/src/pages/LoginPage.dart';
+import 'package:fasturista/src/pages/RegisterPage.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -47,11 +48,12 @@ class _WelcomePageState extends State<WelcomePage> {
 
   Widget _signUpButton() {
     return InkWell(
-      // onTap: () {
-      //   Navigator.push(
-      //       context, PageAnimated(page: SignUpPage()).slideTransition());
-      // },
-      onTap: null,
+      onTap: () {
+        print("INGRESO SIGNUP");
+        Navigator.push(
+            context, PageAnimated(page: RegisterPage()).slideTransition());
+      },
+      //onTap: null,
       child: Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.symmetric(vertical: 13),

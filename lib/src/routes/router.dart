@@ -4,6 +4,7 @@ import 'package:fasturista/src/pages/SignUpPage.dart';
 import 'package:fasturista/src/pages/WelcomePage.dart';
 import 'package:fasturista/src/pages/map.dart';
 import 'package:fasturista/src/pages/profile.dart';
+import 'package:fasturista/src/pages/RegisterPage.dart';
 import 'package:flutter/material.dart';
 
 Map<String, WidgetBuilder> getApplicationRoutes() {
@@ -21,8 +22,11 @@ Widget getRoutePage(path, {parameters}) {
       break;
     case "profile":
       return Profile(
-        userEmail: parameters["email"],
+        user: parameters,
       );
+      break;
+    case "register":
+      return RegisterPage();
       break;
     case "optimalpath":
       return OptimalPath();

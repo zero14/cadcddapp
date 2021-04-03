@@ -17,6 +17,33 @@ class _OptimalPathState extends State<OptimalPath> {
   bool _showDay = false;
   final random = new Random();
 
+  Widget _routeOrLunch(String typePoint, double duration) {
+    if (typePoint == 'route') {
+      return Expanded(
+        child: Container(
+          height: 60.0,
+          width: 300.0,
+          margin: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            boxShadow: [BoxShadow(blurRadius: 10.0, color: Colors.green)],
+            color: Colors.white,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.timer),
+              Text(
+                  "Tiempo promedio de recorrido: ${duration.toStringAsFixed(2)} min."),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Container();
+  }
+
   Widget _getContainerDay(bool showDay, int day) {
     if (showDay) {
       int dayRandom = (random.nextInt(3) + 1);
@@ -53,6 +80,7 @@ class _OptimalPathState extends State<OptimalPath> {
     final List<Widget> items = [];
 
     int index = 0;
+    int indexColor = 0;
     int lastIndex = widget.itinerarios.length;
 
     widget.itinerarios.forEach((itinerario) {
@@ -60,80 +88,108 @@ class _OptimalPathState extends State<OptimalPath> {
       index = 0;
 
       for (var lugar in itinerario.lugares) {
-        final container = Container(
-          child: Column(
-            children: [
-              _getContainerDay(_showDay, itinerario.day),
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        width: 2,
-                        height: 50,
-                        color: Colors.black,
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(left: 5.0, right: 5.0),
-                        padding: const EdgeInsets.all(5.0),
-                        decoration: BoxDecoration(
-                          color: colors[(index + 1) % 3],
-                          borderRadius: BorderRadius.circular(50.0),
+        print(lugar.type);
+
+        if (lugar.type != "lunch") {
+          final container = Container(
+            child: Column(
+              children: [
+                lugar.type != "route" && lugar.type != "lunch"
+                    ? _getContainerDay(_showDay, itinerario.day)
+                    : Container(),
+                Row(
+                  children: [
+                    Column(
+                      children: [
+                        Container(
+                          width: 2,
+                          height: 50,
+                          color: Colors.black,
                         ),
-                        child: Icon(Icons.directions_run, color: Colors.white),
-                      ),
-                      Container(
-                        width: 2,
-                        height: 50,
-                        color: lastIndex == index ? Colors.white : Colors.black,
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Container(
-                      height: 100,
-                      margin: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border(
-                          top: BorderSide(width: 4, color: Colors.greenAccent),
-                        ),
-                        boxShadow: [
-                          BoxShadow(blurRadius: 10, color: Colors.black26),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(lugar.name,
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              Text(lugar.formattedAddress,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                  ))
-                            ],
+                        Container(
+                          margin: const EdgeInsets.only(left: 5.0, right: 5.0),
+                          padding: const EdgeInsets.all(5.0),
+                          decoration: BoxDecoration(
+                            color: colors[(indexColor + 1) % 3],
+                            borderRadius: BorderRadius.circular(50.0),
                           ),
+                          child:
+                              Icon(Icons.directions_run, color: Colors.white),
                         ),
-                      ),
+                        Container(
+                          width: 2,
+                          height: 50,
+                          color:
+                              lastIndex == index ? Colors.white : Colors.black,
+                        ),
+                      ],
                     ),
-                  )
-                ],
-              ),
-            ],
-          ),
-        );
+                    lugar.type != "route" && lugar.type != "lunch"
+                        ? Expanded(
+                            child: Container(
+                              height: 100,
+                              margin: const EdgeInsets.all(10.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border(
+                                  top: BorderSide(
+                                      width: 4, color: Colors.greenAccent),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                      blurRadius: 10, color: Colors.black26),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          lugar.horario != null
+                                              ? Text(
+                                                  '${lugar.horario.inicio} - ${lugar.horario.fin}',
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                )
+                                              : Container()
+                                        ],
+                                      ),
+                                      Text(lugar.name,
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold)),
+                                      Text(lugar.formattedAddress,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ))
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        : _routeOrLunch(lugar.type, lugar.duration)
+                  ],
+                ),
+              ],
+            ),
+          );
 
-        _showDay = false;
+          _showDay = false;
 
-        index++;
+          indexColor++;
 
-        items..add(container);
+          items..add(container);
+        }
       }
+      index++;
     });
 
     return items;

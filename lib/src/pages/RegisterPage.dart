@@ -1,25 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
-import 'package:fasturista/src/models/User.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:flutter_tags/flutter_tags.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-class Profile extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
+  RegisterPage({Key key}) : super(key: key);
+
   @override
-  _ProfileState createState() => _ProfileState();
-
-  Profile({Key key, this.user}) : super(key: key);
-
-  final User user;
+  _RegisterState createState() => _RegisterState();
 }
 
-class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
+class _RegisterState extends State<RegisterPage>
+    with SingleTickerProviderStateMixin {
   final picker = ImagePicker();
-  final List<String> _list = [];
   File _image;
   List _items;
   String _name = "";
@@ -44,16 +42,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    // _tabController = TabController(length: 1, vsync: this);
-    // _scrollViewController = ScrollController();
-
-    _inputDateController.text = widget.user.birthday;
-    _inputNameController.text = widget.user.name;
-    _inputLastNameController.text = widget.user.lastname;
-    _inputEmailController.text = widget.user.email;
-    _inputPhoneController.text = widget.user.phone;
-    _items = widget.user.preferences;
-    //_items = _list.toList();
+    _inputDateController.text = "";
+    _inputNameController.text = "";
+    _inputLastNameController.text = "";
+    _inputEmailController.text = "";
+    _inputPhoneController.text = "";
+    _items = [];
   }
 
   Future _imgFromGallery() async {
@@ -109,7 +103,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   }
 
   Widget _createButtonSave() {
-    if (!this._editEnabled) return Container();
+    //if (!this._editEnabled) return Container();
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: ButtonTheme(
@@ -117,7 +111,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         child: RaisedButton(
           textColor: Colors.white,
           color: Colors.green,
-          child: Text("Guardar"),
+          child: Text("Registrarme"),
           onPressed: () {},
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
@@ -136,12 +130,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       columns: 0,
       heightHorizontalScroll: 60 * (14 / 14),
       textField: TagsTextField(
+        helperText: 'agregar preferencias',
         autofocus: false,
         textStyle: TextStyle(
           fontSize: 14,
           //height: 1
         ),
-        enabled: _editEnabled,
         constraintSuggestion: true,
         onSubmitted: (String str) {
           setState(() {
@@ -162,14 +156,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             activeColor: Colors.green[400],
             removeButton: ItemTagsRemoveButton(
               backgroundColor: Colors.green[900],
-              onRemoved: !_editEnabled
-                  ? null
-                  : () {
-                      setState(() {
-                        _items.removeAt(index);
-                      });
-                      return true;
-                    },
+              onRemoved: () {
+                setState(() {
+                  _items.removeAt(index);
+                });
+                return true;
+              },
             ),
             textScaleFactor:
                 utf8.encode(item.substring(0, 1)).length > 2 ? 0.8 : 1,
@@ -221,12 +213,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       ),
       padding: const EdgeInsets.all(10.0),
       child: GestureDetector(
-        onTap: _editEnabled
-            ? () {
-                // _imgFromGallery();
-                _showPicker(context);
-              }
-            : null,
+        onTap: () {
+          // _imgFromGallery();
+          _showPicker(context);
+        },
         child: CircleAvatar(
           radius: 65,
           backgroundColor: Colors.green[200],
@@ -254,13 +244,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Widget _createInputName() {
     return TextFormField(
-      enabled: _editEnabled,
       controller: _inputNameController,
       keyboardType: TextInputType.name,
       decoration: InputDecoration(
-        border: _editEnabled
-            ? OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))
-            : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
         labelText: "Nombre",
         helperText: "",
         prefixIcon: Icon(Icons.person),
@@ -275,13 +262,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Widget _createInputLastName() {
     return TextFormField(
-      enabled: _editEnabled,
       controller: _inputLastNameController,
       keyboardType: TextInputType.name,
       decoration: InputDecoration(
-        border: _editEnabled
-            ? OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))
-            : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
         labelText: "Apellido",
         helperText: "",
         prefixIcon: Icon(Icons.person),
@@ -296,13 +280,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Widget _createInputEmail() {
     return TextFormField(
-      enabled: _editEnabled,
       controller: _inputEmailController,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
-        border: _editEnabled
-            ? OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))
-            : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
         labelText: "Correo electrónico",
         helperText: "",
         prefixIcon: Icon(Icons.email),
@@ -317,17 +298,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Widget _createInputPhone() {
     return TextFormField(
-      enabled: _editEnabled,
       controller: _inputPhoneController,
       keyboardType: TextInputType.phone,
-      maxLength: 9,
       inputFormatters: <TextInputFormatter>[
         MaskedInputFormatter('###-###-###')
       ],
       decoration: InputDecoration(
-        border: _editEnabled
-            ? OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))
-            : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
         labelText: "Móvil",
         helperText: "",
         prefixIcon: Icon(Icons.mobile_screen_share),
@@ -342,14 +319,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Widget _createInputDate(context) {
     return TextFormField(
-      enabled: _editEnabled,
       controller: _inputDateController,
       enableInteractiveSelection: false,
       keyboardType: TextInputType.datetime,
       decoration: InputDecoration(
-        border: _editEnabled
-            ? OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))
-            : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
         labelText: "Fecha de Nacimiento",
         helperText: "",
         prefixIcon: Icon(Icons.date_range),
@@ -390,10 +364,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Perfil"),
+          title: Text("Registro"),
           centerTitle: true,
           backgroundColor: Colors.green,
-          actions: [
+/*          actions: [
             IconButton(
               icon: _showButtonEditOrCancel(),
               onPressed: () {
@@ -402,7 +376,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 });
               },
             ),
-          ],
+          ],*/
         ),
         body: Stack(
           children: [
@@ -424,8 +398,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       _createInputPhone(),
                       _createInputDate(context),
                       ExpansionTile(
-                        maintainState: _editEnabled,
-                        initiallyExpanded: !_editEnabled,
+                        initiallyExpanded: true,
                         title: Text("Preferencias"),
                         children: [_tag],
                       ),
